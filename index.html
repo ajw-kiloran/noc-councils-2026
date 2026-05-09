@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>England's Hung Councils — May 2026 · Coalition Arithmetic</title>
+
+<!-- Discoverability: link-only, not search-engine indexed -->
+<meta name="robots" content="noindex, nofollow">
+
+<!-- Description for link previews and tab tooltips -->
+<meta name="description" content="Coalition arithmetic and viability scoring for the 64 English councils ending the May 2026 local elections in no overall control. Per-council seat breakdowns, alliance simulator, source-checked data.">
+
+<!-- Open Graph (WhatsApp, Slack, Facebook, LinkedIn link previews) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="England's Hung Councils — May 2026">
+<meta property="og:description" content="Coalition arithmetic and viability scoring for the 64 English councils ending the May 2026 local elections in no overall control. Per-council seat breakdowns, alliance simulator, source-checked data.">
+<meta property="og:site_name" content="NOC Councils 2026">
+<meta property="og:locale" content="en_GB">
+<!-- Once you know your final URL, set it here so previews are stable, e.g.: -->
+<!-- <meta property="og:url" content="https://YOUR-USERNAME.github.io/noc-councils-2026/"> -->
+
+<!-- Twitter / X card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="England's Hung Councils — May 2026">
+<meta name="twitter:description" content="Coalition arithmetic for the 64 English councils ending the May 2026 elections in no overall control.">
+
+<style>
+:root {
+  color-scheme: light;
+  --bg: #FAFAF7;
+  --surface: #FFFFFF;
+  --surface-2: #F4F2EC;
+  --border: #E2DED3;
+  --text: #1A1A1A;
+  --muted: #6B6457;
+  --accent: #1F3A5F;
+  --warn-bg: #FFF4E0;
+  --warn-text: #6B4900;
+
+  --p-LAB: #E4003B;
+  --p-CON: #0087DC;
+  --p-REF: #12B6CF;
+  --p-LD:  #FAA61A;
+  --p-GRN: #5DA94A;
+  --p-IND: #999999;
+  --p-OTH: #6F42C1;
+
+  --good: #2D7A4A;
+  --med:  #B58300;
+  --bad:  #B23A3A;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.45;
+  font-size: 14px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; padding: 18px 22px 80px; }
+
+header.top h1 {
+  font-size: 22px;
+  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+}
+header.top p.sub {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.stat b { color: var(--text); font-size: 16px; display: block; }
+
+.disclaimer {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border: 1px solid #E9C77B;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  font-size: 12.5px;
+}
+.disclaimer b { font-weight: 600; }
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+  align-items: center;
+}
+.controls select, .controls input {
+  font: inherit;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 6px;
+  color: var(--text);
+}
+.controls input { min-width: 180px; }
+.controls label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-right: 4px;
+}
+.count-readout {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#list {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 900px) {
+  #list { grid-template-columns: 1fr 1fr; }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.1s, box-shadow 0.1s;
+}
+.card:hover {
+  border-color: #B6AC93;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.card-head .name {
+  font-weight: 600;
+  font-size: 15px;
+}
+.card-head .tier {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.confidence {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+.confidence.HIGH { background: #D4E9DA; color: #1F5C36; }
+.confidence.MED  { background: #FBE9C2; color: #6B4900; }
+.confidence.LOW  { background: #F4D3D3; color: #842121; }
+
+.bar {
+  display: flex;
+  height: 14px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--surface-2);
+  margin: 6px 0 8px;
+}
+.seg { height: 100%; }
+.seg.LAB { background: var(--p-LAB); }
+.seg.CON { background: var(--p-CON); }
+.seg.REF { background: var(--p-REF); }
+.seg.LD  { background: var(--p-LD); }
+.seg.GRN { background: var(--p-GRN); }
+.seg.IND { background: var(--p-IND); }
+.seg.OTH { background: var(--p-OTH); }
+
+.summary {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.summary .gap-to-maj {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Detail panel */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20,18,12,0.35);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 50;
+}
+.overlay.hidden { display: none; }
+.detail {
+  background: var(--surface);
+  width: 100%;
+  max-width: 760px;
+  height: 100%;
+  overflow-y: auto;
+  padding: 22px 26px 80px;
+  box-shadow: -2px 0 12px rgba(0,0,0,0.08);
+}
+.detail-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+.detail-head h2 { margin: 0; font-size: 20px; }
+.detail-head .closeBtn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.detail-head .closeBtn:hover { background: var(--surface-2); }
+
+.detail h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 22px 0 8px;
+  font-weight: 600;
+}
+
+.detail .meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 12px;
+  row-gap: 4px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.detail .meta dt { color: var(--muted); }
+.detail .meta dd { margin: 0; }
+
+.seat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.seat-table th, .seat-table td {
+  text-align: left;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.seat-table th { font-weight: 600; color: var(--muted); }
+.swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.issues { margin: 0; padding-left: 18px; font-size: 13px; }
+.issues li { margin: 3px 0; }
+
+/* Coalition simulator */
+.simulator {
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.party-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.chip .swatch { margin-right: 0; }
+.chip.on {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+.chip.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sim-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+.sim-bar {
+  position: relative;
+  height: 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  flex: 1;
+  min-width: 200px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.sim-bar-fill {
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.15s;
+}
+.sim-bar-line {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--bad);
+}
+.sim-meta { display: flex; gap: 12px; font-size: 12.5px; }
+.sim-meta b { color: var(--text); }
+
+.viability-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.viability-pill.HIGH { background: #D4E9DA; color: #1F5C36; }
+.viability-pill.MED  { background: #FBE9C2; color: #6B4900; }
+.viability-pill.LOW  { background: #F4D3D3; color: #842121; }
+.viability-pill.SHORT { background: #E0E0E0; color: #555; }
+
+.suggestions {
+  display: grid;
+  gap: 8px;
+}
+.suggestion {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+}
+.suggestion:hover { border-color: #B6AC93; }
+.suggestion .title {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+.suggestion .parties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.suggestion .parties span {
+  background: var(--surface-2);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.sources { font-size: 12px; color: var(--muted); }
+.sources a { color: var(--accent); text-decoration: none; }
+.sources a:hover { text-decoration: underline; }
+
+/* Kingmaker tagging */
+.king-line {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+}
+.king-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #FFF6CC;
+  color: #6B4900;
+  border: 1px solid #F1D685;
+}
+.king-badge.none { background: #EEE; color: #555; border-color: #DDD; }
+.king-badge.alt-flag {
+  background: #E5E1F8;
+  color: #3C2E7A;
+  border-color: #C9C0EC;
+}
+.kingmaker-overview {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 12.5px;
+}
+.kingmaker-overview h4 {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+.kingmaker-overview .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.kingmaker-overview .row .pill {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.kingmaker-overview .row .pill:hover { border-color: #B6AC93; }
+.kingmaker-overview .row .pill b { color: var(--text); }
+
+.king-analysis {
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+.king-analysis p { margin: 4px 0; }
+.king-analysis .lead {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.king-analysis .alt {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: #FFF;
+  border: 1px dashed #C9C0EC;
+  border-radius: 6px;
+  color: #3C2E7A;
+}
+.king-analysis .power-bars {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+}
+.power-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 30px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.power-bar {
+  height: 8px;
+  background: var(--surface);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.power-bar > div { height: 100%; background: var(--accent); }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.legend span { display: inline-flex; align-items: center; gap: 4px; }
+
+footer.bottom {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+}
+footer.bottom h4 { margin: 12px 0 4px; color: var(--text); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>England's hung councils — May 2026</h1>
+  <p class="sub">Coalition arithmetic and viability for English councils ending in no overall control after May 7, 2026.</p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="disclaimer">
+    <b>⚠ Preliminary data.</b>
+    Counts were declared 7–8 May; some recounts and one postponed ward (Bradford – Idle &amp; Thackley) may shift exact figures.
+    Confidence labels per council reflect source agreement.
+    Verify against the council's own official declaration before quoting.
+  </div>
+
+  <div class="legend" id="legend"></div>
+</header>
+
+<div class="kingmaker-overview" id="kingmaker-overview"></div>
+
+<section class="controls">
+  <label>Tier <select id="f-tier"><option value="">All</option></select></label>
+  <label>Largest party <select id="f-largest"><option value="">All</option></select></label>
+  <label>Kingmaker <select id="f-king"><option value="">All</option></select></label>
+  <label>Confidence <select id="f-conf"><option value="">All</option><option value="HIGH">High</option><option value="MED">Medium</option><option value="LOW">Low</option></select></label>
+  <label>Sort <select id="f-sort">
+    <option value="alpha">Council A→Z</option>
+    <option value="seats">Total seats ↓</option>
+    <option value="gap">Smallest gap to majority</option>
+    <option value="largest">Largest party seats ↓</option>
+  </select></label>
+  <input id="f-search" type="search" placeholder="Search councils, parties, issues…">
+  <span class="count-readout" id="readout"></span>
+</section>
+
+<main id="list"></main>
+
+<div id="overlay" class="overlay hidden">
+  <aside class="detail" id="detail"></aside>
+</div>
+
+<footer class="bottom">
+  <h4>Methodology</h4>
+  <p>Coalition viability is scored from a pairwise compatibility matrix (Lab–LD = 0.78, Lab–Green = 0.80, Lab–Con = 0.22, Con–Reform = 0.50, Lab–Reform = 0.06 etc.) and the lowest pair score determines the overall floor. A coalition needs (a) seats ≥ majority threshold and (b) a viability floor ≥ 0.45 to be flagged green/medium. Independents and Other are scored as wildcards (default 0.55). Reform UK's national position has been to reject formal pacts with Conservatives, which is reflected in the score; observed local pacts may differ.</p>
+  <p><b>Kingmaker analysis.</b> For each council we enumerate every minimum-winning coalition (one where every party is critical — remove any and the coalition loses). The "pivotal frequency" of each party is the number of viable MWCs it appears in. The kingmaker is the smaller party that appears in the most viable MWCs. A council is flagged "co-pivotal" when three or more parties are equally pivotal (any pair forms a majority — Cambridge is the canonical example). The dashboard also flags councils where a viable bloc can form a majority <i>excluding</i> the largest party — typically when the 2nd and 3rd parties combined clear the threshold.</p>
+  <h4>Sources</h4>
+  <p>BBC News election results, Election Maps UK (electionmaps.uk/le2026), Open Council Data UK (opencouncildata.co.uk), Local Government Chronicle live blog, OnLondon, individual council websites, ITV regional, regional newspapers, individual Wikipedia council-election articles. Per-council source URLs are listed in each detail view.</p>
+  <h4>Caveats &amp; gaps</h4>
+  <p>Lewisham (Green mayor + Labour-led chamber majority) and Tower Hamlets (Aspire mayor + chamber majority retained) were declared late and are not NOC. Croydon was added once the count concluded — only one of the three late-declaring boroughs ended in NOC. Bury, Rushmoor, Cannock Chase, Epping Forest, Swindon and Bradford figures are flagged LOW/MED confidence — totals do not always reconcile across sources. All English district councils on this list are scheduled for abolition in 2028 under Local Government Reorganisation; this universally constrains how ambitious any new administration can be.</p>
+</footer>
+
+</div>
+
+<script>
+// ================================================================
+// DATA — All NOC councils after the May 7, 2026 elections.
+// Seats keys: LAB, CON, REF (Reform UK), LD (Liberal Democrat),
+// GRN (Green), IND (Independents), OTH (other named groups).
+// ================================================================
+const COUNCILS = [
+  // --- Counties ---
+  {name:"East Sussex",tier:"County",total:50,majority:26,seats:{LAB:0,CON:3,REF:22,LD:13,GRN:11,IND:1,OTH:0},othLabel:"",prev:"NOC (Conservative minority)",largest:"REF",issues:["Last election before LGR abolition into new Sussex unitaries — caretaker mandate.","Reform largest but no plausible governing partner; Tory rump too small.","Lab+LD+Green = 24, two short of 26 — needs Independent (1) and a defection."],confidence:"HIGH",sources:["https://en.wikipedia.org/wiki/2026_East_Sussex_County_Council_election","https://www.eastsussex.gov.uk/your-council/local-elections/elections/east-sussex-county-council-elections-may-2026"]},
+  {name:"Hampshire",tier:"County",total:78,majority:40,seats:{LAB:1,CON:27,REF:20,LD:26,GRN:1,IND:1,OTH:2},othLabel:"Whitehill & Bordon Community + Community Campaign Hart",prev:"Conservative majority since 1997",largest:"CON",issues:["Con (27) + LD (26) = 53 — comfortable arithmetic but deep policy gulf on planning, housing, council tax.","Hampshire & Solent Mayoral Combined County Authority being established for 2028 — the new admin is a wind-down.","Reform (20) too small to govern alone; a Con-Reform pact would still need the small groups to scrape past 40."],confidence:"HIGH",sources:["https://www.hants.gov.uk/News/20260508Electionresult26","https://en.wikipedia.org/wiki/2026_Hampshire_County_Council_election"]},
+  {name:"Norfolk",tier:"County",total:84,majority:43,seats:{LAB:1,CON:8,REF:40,LD:13,GRN:12,IND:1,OTH:9},othLabel:"Great Yarmouth First (9)",prev:"Conservative majority",largest:"REF",issues:["Great Yarmouth First (9, led by Rupert Lowe) are the kingmakers — Reform 40 + GYF 9 = 49.","Tory leader Kay Mason Billig publicly ruled out Reform coalition.","SEND, social care and coastal flood spend dominate inherited budget pressures."],confidence:"HIGH",sources:["https://www.norfolk.gov.uk/article/77122/2026-election-results","https://en.wikipedia.org/wiki/2026_Norfolk_County_Council_election"]},
+  {name:"West Sussex",tier:"County",total:70,majority:36,seats:{LAB:5,CON:11,REF:23,LD:23,GRN:7,IND:1,OTH:0},othLabel:"",prev:"Conservative majority since 1997",largest:"REF/LD tied",issues:["Reform and Lib Dems tied as largest party at 23 each.","Lab+LD+Green+Ind = 36 — a wafer-thin progressive bloc, exactly on majority.","Sussex MCCA negotiations and 2028 unitary structure are the immediate flashpoints."],confidence:"HIGH",sources:["https://www.westsussex.gov.uk/news/west-sussex-county-council-election-results/","https://en.wikipedia.org/wiki/2026_West_Sussex_County_Council_election"]},
+
+  // --- Unitary Authorities ---
+  {name:"Blackburn with Darwen",tier:"Unitary",total:51,majority:26,seats:{LAB:20,CON:5,REF:9,LD:0,GRN:0,IND:17,OTH:0},othLabel:"",prev:"Labour majority since 2011",largest:"LAB",issues:["Pro-Palestine/Gaza independents won 6 seats and broke Labour's majority.","Lab+Ind = 37 if Independents cohere, but the 17 indies are split between Gaza- and traditional-independents.","Majority-Muslim borough; foreign-policy and community relations directly shaping votes."],confidence:"HIGH",sources:["https://en.wikipedia.org/wiki/2026_Blackburn_with_Darwen_Borough_Council_election","https://www.blogpreston.co.uk/2026/05/blackburn-with-darwen-council-2026-local-election-results-in-full/"]},
+  {name:"Hartlepool",tier:"Unitary",total:36,majority:19,seats:{LAB:14,CON:0,REF:15,LD:0,GRN:0,IND:7,OTH:0},othLabel:"",prev:"Labour majority",largest:"REF",issues:["Reform won every contested seat; Labour leader Pamela Hargreaves lost her own ward.","Reform 15 + 4 Independent votes = bare 19 majority; minority-Reform admin most likely.","Children's services overspend (~£20m higher than 4 yrs ago) is the dominant budget pressure."],confidence:"HIGH",sources:["https://www.hartlepool.gov.uk/news/article/261/local-elections-2026","https://en.wikipedia.org/wiki/2026_Hartlepool_Borough_Council_election"]},
+  {name:"Isle of Wight",tier:"Unitary",total:39,majority:20,seats:{LAB:1,CON:2,REF:19,LD:4,GRN:2,IND:11,OTH:0},othLabel:"",prev:"NOC (Independent/Green Alliance Group)",largest:"REF",issues:["Reform one seat short of majority; one Independent crossing would suffice.","Alliance Group leader Phil Jordan lost his seat; the previous administration is dissolved.","Island will be absorbed into Hampshire & Solent MCCA — devolution terms loom over coalition."],confidence:"HIGH",sources:["https://en.wikipedia.org/wiki/2026_Isle_of_Wight_Council_election","https://onthewight.com/isle-of-wight-council-elections-leave-local-authority-under-no-overall-control/"]},
+  {name:"Kingston upon Hull",tier:"Unitary",total:57,majority:29,seats:{LAB:16,CON:0,REF:10,LD:26,GRN:0,IND:5,OTH:0},othLabel:"",prev:"Liberal Democrat majority",largest:"LD",issues:["LD 3 seats short; minority admin relying on case-by-case Lab support most likely.","Hull & East Yorkshire Mayor (Reform's Luke Campbell, 2025) and council now under different parties.","City of Culture legacy spending and Humber decarbonisation the live policy fault lines."],confidence:"HIGH",sources:["https://www.thehullstory.com/allarticles/hull-city-council-election-results","https://en.wikipedia.org/wiki/2026_Hull_City_Council_election"]},
+  {name:"Milton Keynes",tier:"Unitary",total:60,majority:31,seats:{LAB:19,CON:12,REF:9,LD:20,GRN:0,IND:0,OTH:0},othLabel:"",prev:"NOC (Lab/LD coalition)",largest:"LD",issues:["Lab+LD progressive alliance confirmed post-election: 39 seats, comfortable working majority.","Among the most stable arrangements on this list — partners have governed together pre-election.","Thames Valley MSA negotiations broadly aligned; Reform/Con pushing back on devolution terms."],confidence:"HIGH",sources:["https://www.mkfm.com/news/local-news/confirmed-labour-and-lib-dems-unite-in-progressive-alliance-to-run-milton-keynes-council/","https://en.wikipedia.org/wiki/2026_Milton_Keynes_City_Council_election"]},
+  {name:"North East Lincolnshire",tier:"Unitary",total:42,majority:22,seats:{LAB:11,CON:10,REF:14,LD:3,GRN:0,IND:4,OTH:0},othLabel:"",prev:"Conservative majority",largest:"REF",issues:["Reform's stated priority: scrapping Cleethorpes pedestrianisation — flashpoint for any pact.","Lab+Con+LD = 24 (anti-Reform bloc) is feasible but requires old rivals to cooperate.","Humber freeport and offshore wind investment debate splits the chamber."],confidence:"HIGH",sources:["https://en.wikipedia.org/wiki/2026_North_East_Lincolnshire_Council_election","https://gi-grimsby.co.uk/2026/05/08/reform-uk-becomes-biggest-party-on-north-east-lincolnshire-council/"]},
+  {name:"Peterborough",tier:"Unitary",total:60,majority:31,seats:{LAB:11,CON:13,REF:5,LD:8,GRN:6,IND:9,OTH:8},othLabel:"Peterborough First (8)",prev:"NOC (Lab/LD/Peterborough First coalition)",largest:"CON",issues:["Chronically hung; previous Lab/LD/PF coalition (~27) must be rebuilt with Reform up to 5.","High recent immigration; community cohesion + school place provision driving protest votes.","OFSTED-led children's services improvement is the binding cross-party priority."],confidence:"HIGH",sources:["https://en.wikipedia.org/wiki/2026_Peterborough_City_Council_election","https://www.peterboroughtoday.co.uk/news/politics/local-election-2026-the-full-results-for-each-ward-in-peterborough-8513246"]},
+  {name:"Southampton",tier:"Unitary",total:51,majority:26,seats:{LAB:24,CON:6,REF:8,LD:7,GRN:6,IND:0,OTH:0},othLabel:"",prev:"Labour majority",largest:"LAB",issues:["Labour 2 short of majority; Lab+LD = 31, the most natural arrangement.","Final election before South West Hampshire unitary in 2028 — caretaker council.","2026-27 budget commits £10m schools upgrade; coalition impasse threatens delivery."],confidence:"HIGH",sources:["https://www.southampton.gov.uk/news/article/southampton-city-council-local-elections-results-2026/","https://en.wikipedia.org/wiki/2026_Southampton_City_Council_election"]},
+  {name:"Southend-on-Sea",tier:"Unitary",total:51,majority:26,seats:{LAB:17,CON:11,REF:11,LD:3,GRN:4,IND:5,OTH:0},othLabel:"",prev:"NOC (Lab/LD/Ind coalition)",largest:"LAB",issues:["NOC since 2019; Reform now matches Conservatives, fragmenting the chamber further.","Lab+LD+Green = 24, two short — needs Independent backing.","Essex unitary reorganisation places Southend's future structure unresolved."],confidence:"HIGH",sources:["https://www.southend.gov.uk/news/article/3531/local-election-results-confirmed-for-southend-on-sea","https://en.wikipedia.org/wiki/2026_Southend-on-Sea_City_Council_election"]},
+  {name:"Swindon",tier:"Unitary",total:60,majority:31,seats:{LAB:19,CON:23,REF:14,LD:1,GRN:0,IND:3,OTH:0},othLabel:"",prev:"Labour majority",largest:"CON",issues:["First all-out election since 2012 — composition reshuffled in one night.","Con+Reform = 37 mathematically, but a formal Tory-Reform pact contested nationally.","Source totals reported inconsistently; smaller-party seat counts approximate.","Thames Valley MSA endorsement decision will be the new chamber's first big vote."],confidence:"LOW",sources:["https://swindonlink.com/news/election-result-2026/","https://en.wikipedia.org/wiki/2026_Swindon_Borough_Council_election","https://www.swindon.gov.uk/electionresults"]},
+
+  // --- London Boroughs ---
+  {name:"Barnet",tier:"London",total:63,majority:32,seats:{LAB:31,CON:31,REF:0,LD:0,GRN:1,IND:0,OTH:0},othLabel:"",prev:"Labour majority (gained 2022)",largest:"LAB/CON tied",issues:["Lab and Con tied at 31; the single Green councillor is literal kingmaker.","Large Jewish community; planning along Northern line corridor an active issue.","Either side needs the Green to form a majority — Green is courted by both."],confidence:"HIGH",sources:["https://www.onlondon.co.uk/london-borough-elections-2026-the-results/","https://www.bbc.co.uk/news/election/2026/england/councils/E09000003"]},
+  {name:"Brent",tier:"London",total:57,majority:29,seats:{LAB:16,CON:9,REF:0,LD:11,GRN:7,IND:14,OTH:0},othLabel:"(reporting discrepancy in seat totals)",prev:"Labour majority",largest:"LAB",issues:["Labour collapsed from majority to 16; LD and Green surged.","No two-way coalition reaches 29 alone; Lab+LD+Green = 34 is the obvious bloc.","Wembley regeneration and stadium-area development controversies."],confidence:"MED",sources:["https://www.onlondon.co.uk/london-borough-elections-2026-the-results/","https://www.bbc.co.uk/news/election/2026/england/councils/E09000005"]},
+  {name:"Croydon",tier:"London",total:70,majority:36,seats:{LAB:30,CON:28,REF:2,LD:2,GRN:8,IND:0,OTH:0},othLabel:"",prev:"NOC (Con directly-elected Mayor + Lab largest in chamber)",largest:"LAB",issues:["Conservative Mayor Jason Perry narrowly re-elected (30.7% vs Labour's Rowenna Davis 29.7%) — strong-mayor system means Tory executive with Labour plurality on chamber.","Greens quadrupled (2 → 8) and are the new kingmakers; Con+Green = 36 (exact council majority matching mayor's party).","Council issued two s114 notices (effective bankruptcies, 2020 + 2022); financial recovery plan still dominates every chamber vote.","Lab+Green = 38 chamber majority but Con mayor controls executive — built-in deadlock between mayor and councillors."],confidence:"HIGH",sources:["https://news.croydon.gov.uk/croydon-local-elections-results-2026/","https://en.wikipedia.org/wiki/2026_Croydon_London_Borough_Council_election","https://www.onlondon.co.uk/london-borough-elections-2026-the-results/"]},
+  {name:"Enfield",tier:"London",total:63,majority:32,seats:{LAB:27,CON:31,REF:0,LD:0,GRN:5,IND:0,OTH:0},othLabel:"",prev:"Labour majority (gained 2022)",largest:"CON",issues:["Tories one seat short of full majority.","Greens are the swing — Con+Green = 36, Lab+Green = exactly 32.","Edmonton EcoPark waste facility & air quality remain divisive."],confidence:"HIGH",sources:["https://www.onlondon.co.uk/london-borough-elections-2026-the-results/","https://www.bbc.co.uk/news/election/2026/england/councils/E09000010"]},
+  {name:"Haringey",tier:"London",total:57,majority:29,seats:{LAB:20,CON:0,REF:0,LD:8,GRN:28,IND:1,OTH:0},othLabel:"",prev:"Labour majority",largest:"GRN",issues:["Green surge to 28 — one short of outright majority.","Green+LD = 36, Green+Lab = 48; both viable. Greens likely to lead.","Haringey Development Vehicle (2017–18) controversy still resonates with regeneration debate."],confidence:"HIGH",sources:["https://www.onlondon.co.uk/london-borough-elections-2026-the-results/","https://www.bbc.co.uk/news/election/2026/england/councils/E09000014"]},
+  {name:"Lambeth",tier:"London",total:63,majority:32,seats:{LAB:30,CON:3,REF:0,LD:11,GRN:18,IND:1,OTH:0},othLabel:"",prev:"Labour majority",largest:"LAB",issues:["Labour 2 short of majority; former leader Richard Olszewski lost his seat.","Lab+Green = 48 or Lab+LD = 41 — both clear majorities.","Cressingham Gardens / Central Hill estate regeneration scars Labour's record."],confidence:"MED",sources:["https://www.brixtonbuzz.com/2026/05/live-blog-from-the-lambeth-election-count-at-kennington-oval-8-may-2026/","https://www.onlondon.co.uk/london-borough-elections-2026-the-results/"]},
+  {name:"Newham",tier:"London",total:66,majority:34,seats:{LAB:26,CON:0,REF:0,LD:0,GRN:16,IND:0,OTH:24},othLabel:"Newham Independents Party (24)",prev:"Labour majority + Lab Mayor",largest:"LAB",issues:["Newham Independents Party (24) — new bloc, broadly pro-Palestine/community-activist.","Lab+NIP = 50 (clear majority) but ideological compatibility unclear.","Mayor Forhad Hussain (Lab) re-elected on plurality; mayor-council split possible."],confidence:"HIGH",sources:["https://www.onlondon.co.uk/london-borough-elections-2026-the-results/","https://www.newham.gov.uk/news/article/1549/newham-mayoral-and-local-elections-results-"]},
+  {name:"Southwark",tier:"London",total:63,majority:32,seats:{LAB:29,CON:0,REF:0,LD:12,GRN:22,IND:0,OTH:0},othLabel:"",prev:"Labour majority",largest:"LAB",issues:["Greens went from 0 to 22; Labour 3 short of majority.","Lab+LD = 41 or Lab+Green = 51 — multiple viable centre-left blocs.","Aylesbury Estate and Elephant & Castle regeneration remain lightning rods."],confidence:"HIGH",sources:["https://www.onlondon.co.uk/london-borough-elections-2026-the-results/","https://www.southwark.gov.uk/about-council/voting-and-elections/local-elections-2026/results-2026-local-elections"]},
+  {name:"Wandsworth",tier:"London",total:60,majority:31,seats:{LAB:28,CON:29,REF:0,LD:0,GRN:0,IND:1,OTH:2},othLabel:"(2 seats unreconciled in sources)",prev:"Labour majority (gained 2022 — historic first)",largest:"CON",issues:["Tories 2 short of retaking their former flagship borough.","Independent (Malcolm Grimston, ex-Tory) is the pivotal swing vote.","Clapham Junction high-density housing schemes remain controversial."],confidence:"MED",sources:["https://www.onlondon.co.uk/london-borough-elections-2026-the-results/","https://www.bbc.co.uk/news/election/2026/england/councils/E09000032"]},
+
+  // --- Metropolitan Boroughs ---
+  {name:"Birmingham",tier:"Metropolitan",total:101,majority:51,seats:{LAB:16,CON:16,REF:22,LD:12,GRN:19,IND:14,OTH:2},othLabel:"4 seats pending recount",prev:"Labour majority (under government intervention since 2024 effective bankruptcy)",largest:"REF",issues:["Reform largest but 29 short of majority; no obvious stable coalition.","Council under government commissioners over equal-pay liability + financial recovery plan.","Greens jumped from 2 to 19; cross-party budget cooperation is the only path forward."],confidence:"MED",sources:["https://www.lgcplus.com/politics/governance-and-structure/labour-collapse-in-birmingham-08-05-2026/","https://www.newshub.co.uk/politics/2026/05/09/no-overall-control-in-birmingham-as-reform-and-green-party-make-significant-gains/"]},
+  {name:"Bolton",tier:"Metropolitan",total:60,majority:31,seats:{LAB:20,CON:11,REF:10,LD:5,GRN:3,IND:11,OTH:0},othLabel:"",prev:"NOC (Labour minority)",largest:"LAB",issues:["NOC for several years — fragmentation deepened in 2026.","Labour leader lost his seat on election night.","Reform entered with 10; Lab+LD+Ind = 36 (workable), Lab+Con = 31 (grand-coalition arithmetic)."],confidence:"HIGH",sources:["https://www.bolton.gov.uk/news/article/2037/local-election-results-2026","https://www.placenorthwest.co.uk/local-elections-2026-north-west-results/"]},
+  {name:"Bradford",tier:"Metropolitan",total:87,majority:44,seats:{LAB:12,CON:18,REF:23,LD:9,GRN:7,IND:14,OTH:4},othLabel:"Workers Party + community groups (4); Idle & Thackley ward (3 seats) postponed to June",prev:"Labour majority",largest:"REF",issues:["Council leader Susan Hinchcliffe lost her seat — Labour decapitated.","Idle & Thackley election postponed to June (candidate death) — 3 seats unallocated; total reflects 87 declared.","Manningham/Bradford Moor: Workers Party / community independents in majority-Muslim wards.","Smaller-group totals approximate; verify against bradford.moderngov before quoting."],confidence:"LOW",sources:["https://www.examinerlive.co.uk/news/west-yorkshire-news/bradford-council-election-winners-losers-33917334","https://bradford.moderngov.co.uk/mgElectionResults.aspx?ID=84&RPID=55101469"]},
+  {name:"Coventry",tier:"Metropolitan",total:54,majority:28,seats:{LAB:24,CON:6,REF:20,LD:0,GRN:4,IND:0,OTH:0},othLabel:"",prev:"Labour majority",largest:"LAB",issues:["Reform surged 2 → 20; Tory leader Gary Ridley lost his seat.","Lab+Green = 28 — exactly the majority.","JLR supply chain decline + West Midlands manufacturing job losses driving the protest vote."],confidence:"HIGH",sources:["https://www.coventrytelegraph.net/news/coventry-news/coventry-local-election-results-2026-33916557","https://www.coventry.gov.uk/elections-voting/local-elections-7-may-2026"]},
+  {name:"Dudley",tier:"Metropolitan",total:72,majority:37,seats:{LAB:15,CON:27,REF:23,LD:4,GRN:0,IND:0,OTH:3},othLabel:"Black Country Party (3)",prev:"Conservative minority (NOC)",largest:"CON",issues:["Reform won 22 of 25 contested seats — sharp inroads into both major parties.","Black Country Party (3) holds practical leverage on close votes.","Con+Reform = 50 (clear majority) — most arithmetically obvious arrangement, deeply contested politically."],confidence:"HIGH",sources:["https://www.expressandstar.com/news/politics/dudley-local-election-results-2026-full-list-of-results-as-reform-makes-major-gains-8513239"]},
+  {name:"Kirklees",tier:"Metropolitan",total:69,majority:35,seats:{LAB:0,CON:9,REF:29,LD:5,GRN:12,IND:14,OTH:0},othLabel:"",prev:"NOC (Labour minority)",largest:"REF",issues:["Labour wiped out — lost all 23 of its seats.","Reform 6 short of majority; Greens+Indies+LD = 31 (anti-Reform bloc, just under).","Huddersfield/Dewsbury/Batley: post-industrial Pennine corridor with strong Reform appeal."],confidence:"HIGH",sources:["https://democracy.kirklees.gov.uk/mgElectionResults.aspx?ID=35&RPID=318663789","https://kirkleeslocaltv.com/news/kirklees-council-in-no-overall-control-after-dramatic-election-shake-up-heres-every-result-in-all-23-wards/"]},
+  {name:"Leeds",tier:"Metropolitan",total:99,majority:50,seats:{LAB:48,CON:14,REF:10,LD:6,GRN:11,IND:1,OTH:9},othLabel:"GSIP (3) + Morley Borough Independents (3) + SDP (3)",prev:"Labour majority",largest:"LAB",issues:["Labour just 2 short — Lab+Green = 59 (clear) or Lab+LD = 54 (clear).","SDP entered the chamber with 3 seats in south Leeds — disillusioned-Labour vote.","Bus franchising, mass-transit plans + city-region devolution shape coalition incentives."],confidence:"HIGH",sources:["https://news.leeds.gov.uk/news/new-political-make-up-of-leeds-city-council-5","https://www.yorkshireeveningpost.co.uk/news/politics/leeds-local-election-results-full-list-2026-8513269"]},
+  {name:"Newcastle upon Tyne",tier:"Metropolitan",total:78,majority:40,seats:{LAB:2,CON:3,REF:24,LD:25,GRN:24,IND:0,OTH:0},othLabel:"",prev:"Labour majority since 1958",largest:"LD",issues:["Labour reduced to 2 seats — historic collapse in their northern heartland.","LD+Green = 49 is the only realistic majority bloc; Reform isolated despite gains.","Quayside regen, Metro funding, Tyne Bridge refurb all become coalition test cases."],confidence:"MED",sources:["https://www.itv.com/news/tyne-tees/2026-05-08/north-east-council-election-results","https://new.newcastle.gov.uk/election/council-election-7-may-2026/results"]},
+  {name:"Oldham",tier:"Metropolitan",total:60,majority:31,seats:{LAB:27,CON:6,REF:3,LD:9,GRN:0,IND:7,OTH:8},othLabel:"Oldham Group (8)",prev:"NOC (Labour minority)",largest:"LAB",issues:["Multiple hyper-local independent groupings (Failsworth, Royton).","Lab+LD = 36 plausible; Lab+Oldham Group also workable.","Oldham town centre regen + Metrolink extension are local political priorities."],confidence:"MED",sources:["https://www.oldham.gov.uk/election_results_may7_2026","https://www.theoldhamtimes.co.uk/news/26088313.results-oldham-council-2026-local-elections/"]},
+  {name:"Sheffield",tier:"Metropolitan",total:84,majority:43,seats:{LAB:25,CON:0,REF:13,LD:22,GRN:20,IND:4,OTH:0},othLabel:"",prev:"NOC (Lab/LD/Green committee system)",largest:"LAB",issues:["Sheffield's been NOC since 2008 — fragmentation deepened.","Lab+LD+Green = 67 (large majority) but the three parties bring tensions on transport + housing.","Streets Ahead PFI / tree-felling legacy still shadows trust in the council."],confidence:"MED",sources:["https://www.sheffield.gov.uk/your-city-council/elections/local-elections-results-2026","https://nowthenmagazine.com/articles/labour-decimated-in-sheffields-local-elections-with-greens-and-reform-making-major-gains"]},
+  {name:"Solihull",tier:"Metropolitan",total:51,majority:26,seats:{LAB:0,CON:24,REF:17,LD:6,GRN:4,IND:0,OTH:0},othLabel:"",prev:"Conservative minority (NOC)",largest:"CON",issues:["Tories 2 short despite historic dominance — affluent borough surprise.","Con+LD = 30 is the natural centre-right/centrist arrangement.","HS2 Interchange station at Arden Cross continues to provoke local opposition."],confidence:"HIGH",sources:["https://solihullobserver.co.uk/news/live-2026-solihull-borough-council-election-count/","https://www.solihull.gov.uk/councillors-and-democracy/elections-and-voting/solihull-local-council-elections-may-2026/election-results"]},
+  {name:"Tameside",tier:"Metropolitan",total:57,majority:29,seats:{LAB:25,CON:5,REF:19,LD:0,GRN:0,IND:8,OTH:0},othLabel:"",prev:"Labour majority since 1979",largest:"LAB",issues:["Reform won 18 of 19 contested seats — most dramatic single-night swing in GM.","Labour 4 short; Lab+Ind = 33 if independents cohere.","Ashton/Stalybridge/Droylsden: textile-and-engineering towns with strong Reform appeal."],confidence:"HIGH",sources:["https://www.tamesidecorrespondent.co.uk/2026/05/08/reform-storm-to-victory-in-tameside/","https://tameside.moderngov.co.uk/mgElectionResults.aspx?ID=67&RPID=0"]},
+
+  // --- Districts ---
+  {name:"Huntingdonshire",tier:"District",total:52,majority:27,seats:{LAB:0,CON:15,REF:10,LD:20,GRN:2,IND:3,OTH:2},othLabel:"",prev:"NOC (LD largest)",largest:"LD",issues:["LD+CON = 35 (majority) but unusual ideological coupling.","Reform swept Ramsey wards.","Final term before LGR abolition into new Cambridgeshire unitary."],confidence:"MED",sources:["https://www.huntingdonshire.gov.uk/election-2026/may-2026-election-results/","https://en.wikipedia.org/wiki/2026_Huntingdonshire_District_Council_election"]},
+  {name:"Gosport",tier:"District",total:28,majority:15,seats:{LAB:0,CON:11,REF:10,LD:6,GRN:0,IND:1,OTH:0},othLabel:"",prev:"Liberal Democrat control",largest:"CON",issues:["Reform took 9 of 14 contested seats; Lib Dems ousted from strongholds.","Con+LD = 17 is the obvious centre-right/centrist majority.","Three-way split with no plausible single-party majority."],confidence:"HIGH",sources:["https://www.gosport.gov.uk/article/3180/Gosport-s-2026-local-election-results","https://www.portsmouth.co.uk/news/politics/local-elections-2026-gosport-borough-council-results-8506360"]},
+  {name:"Nuneaton and Bedworth",tier:"District",total:38,majority:20,seats:{LAB:11,CON:9,REF:15,LD:0,GRN:3,IND:0,OTH:0},othLabel:"",prev:"Labour minority (NOC)",largest:"REF",issues:["Reform leapfrogged Labour in a previously safe Labour town.","Lab+Con+Green = 23 — viable anti-Reform bloc.","First NOC-with-Reform-largest in this corner of Warwickshire in decades."],confidence:"HIGH",sources:["https://www.nuneatonandbedworth.gov.uk/election-results","https://www.coventrytelegraph.net/news/local-news/nuneaton-bedworth-borough-council-local-33915304"]},
+  {name:"Oxford",tier:"District",total:48,majority:25,seats:{LAB:20,CON:0,REF:0,LD:9,GRN:13,IND:6,OTH:0},othLabel:"",prev:"Labour majority (NOC pre-defections)",largest:"LAB",issues:["Reform fielded candidates but won zero seats in the city.","Lab+Green = 33 or Lab+LD = 29 — strong centre-left arithmetic.","Greens surged from 9 to 13; Labour's natural partner."],confidence:"HIGH",sources:["https://www.oxford.gov.uk/elections-voting/oxford-city-council-election-results-7-may-2026","https://en.wikipedia.org/wiki/2026_Oxford_City_Council_election"]},
+  {name:"Basildon",tier:"District",total:42,majority:22,seats:{LAB:12,CON:12,REF:11,LD:0,GRN:0,IND:7,OTH:0},othLabel:"",prev:"NOC (Labour minority)",largest:"LAB/CON tied",issues:["Three-way near-tie at the top; Independents (7) hold balance of power.","Reform won 11 of 14 contested in single round.","Lab+Ind = 19 (short) or Con+Ind = 19 (short) — both need additional support."],confidence:"HIGH",sources:["https://en.wikipedia.org/wiki/2026_Basildon_Borough_Council_election","https://www.basildon.gov.uk/article/8431/Elections-Thursday-7-May-2026"]},
+  {name:"Basingstoke and Deane",tier:"District",total:54,majority:28,seats:{LAB:24,CON:12,REF:8,LD:6,GRN:4,IND:0,OTH:0},othLabel:"",prev:"NOC (Lab largest)",largest:"LAB",issues:["Both Lab and Con lost seats; Reform & smaller groups gained.","Lab+LD+Green = 34 — comfortable progressive bloc.","Labour likely to continue minority administration with informal support."],confidence:"LOW",sources:["https://en.wikipedia.org/wiki/2026_Basingstoke_and_Deane_Borough_Council_election","https://www.basingstoke.gov.uk/election-results-2026"]},
+  {name:"Brentwood",tier:"District",total:39,majority:20,seats:{LAB:3,CON:13,REF:7,LD:14,GRN:2,IND:0,OTH:0},othLabel:"",prev:"NOC (LD/Lab coalition)",largest:"LD",issues:["Reform won 7 of 13 contested; Tories down 5.","LD+Lab+Green = 19 (one short) — the previous coalition can no longer govern alone.","Con+Reform = 20 — exactly majority but contested politically."],confidence:"MED",sources:["https://en.wikipedia.org/wiki/2026_Brentwood_Borough_Council_election","https://www.romfordrecorder.co.uk/news/26088438.reform-uk-secure-seven-seats-brentwood-local-elections/"]},
+  {name:"Burnley",tier:"District",total:45,majority:23,seats:{LAB:10,CON:4,REF:12,LD:6,GRN:3,IND:10,OTH:0},othLabel:"",prev:"NOC (Independent/Green/LD coalition)",largest:"REF",issues:["Reform overtook Labour with +11 gains.","Independents (10) decisive bloc; have governed before.","Lab + Ind + LD + Green = 29 — comfortable anti-Reform coalition."],confidence:"HIGH",sources:["https://www.burnleyexpress.net/news/politics/burnley-council-elections-2026-8514067","https://en.wikipedia.org/wiki/2026_Burnley_Borough_Council_election"]},
+  {name:"Cambridge",tier:"District",total:42,majority:22,seats:{LAB:17,CON:1,REF:0,LD:11,GRN:12,IND:0,OTH:1},othLabel:"Your Party (1)",prev:"Labour majority",largest:"LAB",issues:["Reform fielded candidates but won zero seats in the city.","Lab+Green = 29 or Lab+LD = 28 — both clear centre-left majorities.","Greens leapt to 12; second-largest party."],confidence:"HIGH",sources:["https://www.cambridge.gov.uk/news/2026/05/08/cambridge-city-council-election-results-may-2026","https://en.wikipedia.org/wiki/2026_Cambridge_City_Council_election"]},
+  {name:"Cannock Chase",tier:"District",total:36,majority:19,seats:{LAB:10,CON:7,REF:14,LD:0,GRN:0,IND:5,OTH:0},othLabel:"",prev:"NOC",largest:"REF",issues:["Reform swept to largest from a standing start.","Lab+Con+Ind = 22 — the only viable anti-Reform arithmetic.","LGR 2028 abolition complicates any long-term programme."],confidence:"MED",sources:["https://en.wikipedia.org/wiki/2026_Cannock_Chase_District_Council_election","https://www.expressandstar.com/news/cannock-chase-local-election-results-2026-reform-uk-sweeps-to-victory-8514156"]},
+  {name:"Cherwell",tier:"District",total:48,majority:25,seats:{LAB:5,CON:14,REF:13,LD:14,GRN:2,IND:0,OTH:0},othLabel:"",prev:"NOC (LD largest with Green support)",largest:"LD/CON tied",issues:["LD and Conservatives tied at 14; Reform breathing down their necks.","Reform won 6 of 16 contested — major Banbury gains.","Con+Reform = 27 (majority) is a key risk for any progressive arrangement."],confidence:"MED",sources:["https://en.wikipedia.org/wiki/2026_Cherwell_District_Council_election","https://www.banburyguardian.co.uk/news/politics/banbury-local-election-2026-live-8514126"]},
+  {name:"Colchester",tier:"District",total:51,majority:26,seats:{LAB:12,CON:18,REF:5,LD:12,GRN:3,IND:1,OTH:0},othLabel:"",prev:"NOC (Lab/LD coalition)",largest:"CON",issues:["Lab/LD coalition lost 4 seats combined — arithmetic fragile.","Lab+LD+Green = 27 — exactly majority but coalition discipline tested.","Final election before LGR abolition into Essex unitary."],confidence:"HIGH",sources:["https://en.wikipedia.org/wiki/2026_Colchester_City_Council_election","https://www.gazette-news.co.uk/news/26088332.colchester-council-2026-local-election-winners-listed/"]},
+  {name:"Epping Forest",tier:"District",total:54,majority:28,seats:{LAB:0,CON:22,REF:11,LD:7,GRN:6,IND:8,OTH:0},othLabel:"Loughton Residents and others",prev:"NOC (Conservative minority)",largest:"CON",issues:["Tories down 7; Reform up 11.","Con+LD = 29 (just over majority); previous Tory minority arrangement now even weaker.","Loughton Residents and other localists shape every close vote."],confidence:"LOW",sources:["https://en.wikipedia.org/wiki/2026_Epping_Forest_District_Council_election","https://www.eppingforestdc.gov.uk/epping-forest-district-council-election-results/"]},
+  {name:"Exeter",tier:"District",total:39,majority:20,seats:{LAB:18,CON:1,REF:3,LD:5,GRN:10,IND:2,OTH:0},othLabel:"",prev:"Labour majority",largest:"LAB",issues:["Labour 2 short after 14 years of overall control.","Greens doubled (5 → 10); now strong second party.","Lab+Green = 28 is the natural arrangement; Lab+LD = 23 also viable."],confidence:"HIGH",sources:["https://exeterobserver.org/2026/05/07/exeter-city-council-2026-local-elections-results/","https://en.wikipedia.org/wiki/2026_Exeter_City_Council_election"]},
+  {name:"Hart",tier:"District",total:33,majority:17,seats:{LAB:0,CON:5,REF:4,LD:12,GRN:1,IND:0,OTH:11},othLabel:"Community Campaign Hart (11)",prev:"NOC (LD/CCH joint admin)",largest:"LD",issues:["LD+CCH = 23 — comfortable, the existing administration confirmed.","Reform entered with 4 but well short of influence.","Among the more stable NOC arrangements on this list."],confidence:"MED",sources:["https://www.hart.gov.uk/voting-and-elections/7-may-2026-election-results","https://en.wikipedia.org/wiki/2026_Hart_District_Council_election"]},
+  {name:"Havant",tier:"District",total:36,majority:19,seats:{LAB:7,CON:5,REF:10,LD:5,GRN:6,IND:3,OTH:0},othLabel:"",prev:"NOC (Lab/LD/Green)",largest:"REF",issues:["Reform now largest in coastal Hampshire.","Five-way split — no obvious majority coalition.","Lab+LD+Green+Ind = 21 (a viable progressive bloc)."],confidence:"HIGH",sources:["https://www.havant.gov.uk/news/2026/havant-borough-council-election-results-2026","https://en.wikipedia.org/wiki/2026_Havant_Borough_Council_election"]},
+  {name:"Hyndburn",tier:"District",total:35,majority:18,seats:{LAB:17,CON:8,REF:8,LD:0,GRN:1,IND:1,OTH:0},othLabel:"",prev:"Labour majority",largest:"LAB",issues:["Labour 1 short; Con+Reform = 16 — could combine to outvote on motions.","East Lancashire historically solid Labour — significant warning.","Hyper-marginal: 1 Independent or Green crossing decides votes."],confidence:"HIGH",sources:["https://en.wikipedia.org/wiki/2026_Hyndburn_Borough_Council_election","https://www.blogpreston.co.uk/2026/05/hyndburn-council-2026-local-election-results-in-full/"]},
+  {name:"Pendle",tier:"District",total:33,majority:17,seats:{LAB:0,CON:8,REF:5,LD:7,GRN:0,IND:13,OTH:0},othLabel:"",prev:"NOC (Independent minority)",largest:"IND",issues:["Labour wiped out (lost all 3 contested).","Independents (13) decisive but heterogeneous.","LD leader Cllr Whipp lost to Reform by 7 votes."],confidence:"HIGH",sources:["https://www.pendle.gov.uk/results","https://en.wikipedia.org/wiki/2026_Pendle_Borough_Council_election"]},
+  {name:"Preston",tier:"District",total:48,majority:25,seats:{LAB:21,CON:2,REF:5,LD:15,GRN:2,IND:3,OTH:0},othLabel:"",prev:"Labour majority",largest:"LAB",issues:["Labour 4 short; leader Cllr Peel lost his seat.","Lab+LD = 36 — natural cooperation arrangement.","Greens won first-ever city seats."],confidence:"HIGH",sources:["https://www.blogpreston.co.uk/2026/05/local-elections-2026-no-one-has-control-of-preston-city-council-as-labour-lose-majority/","https://en.wikipedia.org/wiki/2026_Preston_City_Council_election"]},
+  {name:"Redditch",tier:"District",total:27,majority:14,seats:{LAB:13,CON:4,REF:8,LD:0,GRN:0,IND:2,OTH:0},othLabel:"",prev:"Labour majority",largest:"LAB",issues:["Labour lost majority by single seat after Reform won 8 of 9 contests.","Con+Reform+Ind = 14 — exact tie with Labour on every vote.","Reform took second place from zero — very fast takeover."],confidence:"HIGH",sources:["https://redditchstandard.co.uk/news/live-2026-redditch-borough-council-election-count/","https://en.wikipedia.org/wiki/2026_Redditch_Borough_Council_election"]},
+  {name:"Rochford",tier:"District",total:39,majority:20,seats:{LAB:0,CON:7,REF:13,LD:5,GRN:0,IND:10,OTH:4},othLabel:"Rochford Residents Assoc. (4)",prev:"NOC (Conservative largest)",largest:"REF",issues:["Reform won 13 of 15 contested.","Tories lost 5; Residents lost 5.","Due for abolition into South East Essex unitary 2027–28."],confidence:"HIGH",sources:["https://en.wikipedia.org/wiki/2026_Rochford_District_Council_election","https://www.msn.com/en-gb/news/uknews/reform-becomes-biggest-party-on-rochford-district-council-after-election-gains/ar-AA22FqFp"]},
+  {name:"Rugby",tier:"District",total:42,majority:22,seats:{LAB:12,CON:15,REF:3,LD:12,GRN:0,IND:0,OTH:0},othLabel:"",prev:"NOC",largest:"CON",issues:["Lab and LD tied at 12; Con largest.","Reform won its first-ever Rugby seats (3).","No two-party majority; three-way negotiation likely."],confidence:"HIGH",sources:["https://rugbyobserver.co.uk/news/rugby-borough-council-remains-under-no-overall-control-following-local-elections/","https://en.wikipedia.org/wiki/2026_Rugby_Borough_Council_election"]},
+  {name:"Rushmoor",tier:"District",total:39,majority:20,seats:{LAB:24,CON:0,REF:8,LD:7,GRN:0,IND:0,OTH:0},othLabel:"(figures approximate)",prev:"NOC (Labour minority post-2025 defections)",largest:"LAB",issues:["Labour largest but two short after 2025 defections formed Independent group.","Reform gained in Aldershot/Farnborough.","LGR 2028 abolition into Hampshire unitary a live issue."],confidence:"LOW",sources:["https://en.wikipedia.org/wiki/2026_Rushmoor_Borough_Council_election","https://www.rushmoor.gov.uk/elections2026/rushmoorresults"]},
+  {name:"Tamworth",tier:"District",total:30,majority:16,seats:{LAB:14,CON:7,REF:9,LD:0,GRN:0,IND:0,OTH:0},othLabel:"",prev:"Labour majority (post-defections technically NOC)",largest:"LAB",issues:["Reform swept all 9 contested wards.","Con+Reform = 16 — exactly enough to outvote Labour on every issue.","Labour fell from 18 to 14."],confidence:"MED",sources:["https://en.wikipedia.org/wiki/2026_Tamworth_Borough_Council_election","https://www.onenewspage.com/n/UK/1ztfis3kiv/Full-list-of-Tamworth-Borough-Council-election-results.htm"]},
+  {name:"Three Rivers",tier:"District",total:39,majority:20,seats:{LAB:2,CON:14,REF:0,LD:18,GRN:3,IND:2,OTH:0},othLabel:"",prev:"NOC (LD minority)",largest:"LD",issues:["Conservatives gained 3; LD lead cut to four.","Reform failed to win any seats despite national surge.","LD+Green+Lab+Ind = 25 — workable progressive bloc."],confidence:"HIGH",sources:["https://www.threerivers.gov.uk/news/council-elections-2026","https://en.wikipedia.org/wiki/2026_Three_Rivers_District_Council_election"]},
+  {name:"Welwyn Hatfield",tier:"District",total:48,majority:25,seats:{LAB:16,CON:12,REF:3,LD:15,GRN:0,IND:2,OTH:0},othLabel:"",prev:"NOC (Lab/LD)",largest:"LAB",issues:["Labour lost 3 to Reform; LD close behind.","Lab+LD = 31 — clean centre-left majority.","LGR abolition 2028 shadows planning."],confidence:"HIGH",sources:["https://www.welhat.gov.uk/voting-elections/election-results-7-may-2026","https://en.wikipedia.org/wiki/2026_Welwyn_Hatfield_Borough_Council_election"]},
+  {name:"West Lancashire",tier:"District",total:54,majority:28,seats:{LAB:20,CON:11,REF:10,LD:5,GRN:3,IND:5,OTH:0},othLabel:"Our West Lancashire (5)",prev:"Labour majority",largest:"LAB",issues:["Labour lost majority; leader Cllr Peel lost personal seat.","Reform gained 9; Greens won first-ever seats (3).","Lab+LD+Green+Ind = 33 — viable progressive bloc."],confidence:"MED",sources:["https://en.wikipedia.org/wiki/2026_West_Lancashire_Borough_Council_election","https://www.placenorthwest.co.uk/local-elections-2026-north-west-results/"]},
+  {name:"West Oxfordshire",tier:"District",total:49,majority:25,seats:{LAB:4,CON:16,REF:3,LD:20,GRN:4,IND:2,OTH:0},othLabel:"",prev:"NOC (LD/Lab/Green)",largest:"LD",issues:["LD largest; Con close at 16.","LD+Lab+Green = 28 — comfortable progressive arrangement continues.","Final term before LGR abolition into Oxfordshire unitary."],confidence:"MED",sources:["https://en.wikipedia.org/wiki/2026_West_Oxfordshire_District_Council_election","https://www.witney-tc.gov.uk/news/west-oxfordshire-district-council-election-results-7th-may-2026/"]},
+  {name:"Worthing",tier:"District",total:37,majority:19,seats:{LAB:15,CON:6,REF:5,LD:1,GRN:8,IND:2,OTH:0},othLabel:"Worthing Community Independents (2)",prev:"Labour majority",largest:"LAB",issues:["Labour 4 short; Greens up 6.","Lab+Green = 23 — natural partnership.","Reform made first inroads into coastal Sussex (5 seats)."],confidence:"HIGH",sources:["https://en.wikipedia.org/wiki/2026_Worthing_Borough_Council_election","https://www.sussexexpress.co.uk/news/politics/council/worthing-borough-council-election-results-labour-loses-overall-control-8514762"]}
+];
+
+// ================================================================
+// PARTIES & COMPATIBILITY
+// ================================================================
+const PARTIES = {
+  LAB: {label: "Labour",          color: "var(--p-LAB)"},
+  CON: {label: "Conservative",    color: "var(--p-CON)"},
+  REF: {label: "Reform UK",       color: "var(--p-REF)"},
+  LD:  {label: "Lib Dem",         color: "var(--p-LD)"},
+  GRN: {label: "Green",           color: "var(--p-GRN)"},
+  IND: {label: "Independents",    color: "var(--p-IND)"},
+  OTH: {label: "Other",           color: "var(--p-OTH)"},
+};
+const PARTY_ORDER = ["LAB","CON","REF","LD","GRN","IND","OTH"];
+
+// Pairwise compatibility 0–1.  A coalition's viability floor =
+// the lowest pair score across all party-pairs in it.
+const COMPAT = {
+  "LAB-LAB":1.00,"LAB-LD":0.78,"LAB-GRN":0.80,"LAB-CON":0.22,"LAB-REF":0.06,"LAB-IND":0.55,"LAB-OTH":0.55,
+  "CON-CON":1.00,"CON-LD":0.55,"CON-GRN":0.30,"CON-REF":0.50,"CON-IND":0.55,"CON-OTH":0.50,
+  "REF-REF":1.00,"REF-LD":0.18,"REF-GRN":0.05,"REF-IND":0.45,"REF-OTH":0.30,
+  "LD-LD":1.00,"LD-GRN":0.74,"LD-IND":0.62,"LD-OTH":0.55,
+  "GRN-GRN":1.00,"GRN-IND":0.62,"GRN-OTH":0.55,
+  "IND-IND":0.65,"IND-OTH":0.55,
+  "OTH-OTH":0.55,
+};
+function pairKey(a,b){
+  const ord = PARTY_ORDER;
+  return ord.indexOf(a) <= ord.indexOf(b) ? `${a}-${b}` : `${b}-${a}`;
+}
+function compatScore(parties){
+  if(parties.length<2) return 1.0;
+  let min = 1.0;
+  for(let i=0;i<parties.length;i++){
+    for(let j=i;j<parties.length;j++){
+      const k = pairKey(parties[i],parties[j]);
+      const v = COMPAT[k] ?? 0.40;
+      if(v<min) min = v;
+    }
+  }
+  return min;
+}
+function viabilityBand(score, seats, majority){
+  if(seats < majority) return "SHORT";
+  if(score >= 0.65) return "HIGH";
+  if(score >= 0.45) return "MED";
+  return "LOW";
+}
+
+// Subset enumeration helper.
+function enumerateSubsets(c){
+  const used = PARTY_ORDER.filter(p => c.seats[p] && c.seats[p] > 0);
+  const out = [];
+  const n = used.length;
+  for(let mask=1; mask < (1<<n); mask++){
+    const parties = [];
+    let total = 0;
+    for(let i=0;i<n;i++){
+      if(mask & (1<<i)){
+        parties.push(used[i]);
+        total += c.seats[used[i]];
+      }
+    }
+    out.push({parties, total});
+  }
+  return out;
+}
+
+// Is this coalition minimum-winning?  Reaches majority, and removing any single
+// party drops it below.
+function isMinWin(parties, seats, majority){
+  const total = parties.reduce((s,p)=>s+(seats[p]||0),0);
+  if(total < majority) return false;
+  for(const p of parties){
+    if(total - (seats[p]||0) >= majority) return false;
+  }
+  return true;
+}
+
+// All winning coalitions, sorted by viability then smallest surplus.
+function enumerateCoalitions(c){
+  const out = [];
+  for(const sub of enumerateSubsets(c)){
+    if(sub.total >= c.majority){
+      const score = compatScore(sub.parties);
+      out.push({parties: sub.parties, total: sub.total, score, band: viabilityBand(score,sub.total,c.majority)});
+    }
+  }
+  out.sort(coalitionRank);
+  return out;
+}
+
+// Minimum-winning coalitions only.  For kingmaker analysis these are what
+// matter — non-MWCs add a redundant party.
+function enumerateMWCs(c){
+  const out = [];
+  for(const sub of enumerateSubsets(c)){
+    if(isMinWin(sub.parties, c.seats, c.majority)){
+      const score = compatScore(sub.parties);
+      out.push({parties: sub.parties, total: sub.total, score, band: viabilityBand(score,sub.total,c.majority), excludes: PARTY_ORDER.filter(p=>(c.seats[p]||0)>0 && !sub.parties.includes(p))});
+    }
+  }
+  out.sort(coalitionRank);
+  return out;
+}
+
+function coalitionRank(a,b){
+  const bandRank = {HIGH:0, MED:1, LOW:2, SHORT:3};
+  if(bandRank[a.band] !== bandRank[b.band]) return bandRank[a.band] - bandRank[b.band];
+  if(a.score !== b.score) return b.score - a.score;
+  return a.total - b.total;
+}
+
+// Kingmaker analysis for a council.
+//   pivotal:        the small-party kingmaker (or largest party if dominant)
+//   pivotalIsLarge: true if largest party also pivotal (no real "kingmaker")
+//   excludingLargest: a viable MWC excluding the largest party, if any
+//   power:          { partyKey: appearances } across viable MWCs
+//   summary:        short text label
+function kingmakerAnalysis(c){
+  const lp = largestPartyKey(c);
+  const mwcs = enumerateMWCs(c);
+  const viable = mwcs.filter(m => m.band === "HIGH" || m.band === "MED");
+  const pool = viable.length > 0 ? viable : mwcs; // fall back to all MWCs if no viable
+  const power = {};
+  for(const m of pool){
+    for(const p of m.parties) power[p] = (power[p]||0) + 1;
+  }
+  // ranked by appearances desc, then by smaller seat count (kingmakers tend small)
+  const ranked = Object.entries(power).sort((a,b)=>{
+    if(b[1] !== a[1]) return b[1] - a[1];
+    return c.seats[a[0]] - c.seats[b[0]];
+  });
+  // Find any viable MWC that excludes the largest party
+  const excludingLargest = pool.find(m => !m.parties.includes(lp));
+
+  // Pick "the kingmaker" — most useful framing:
+  // (a) if the largest party appears in ALL pool MWCs and is needed,
+  //     the kingmaker is the smallest party tied to it most often.
+  // (b) if not, the smallest party that appears most often is the kingmaker.
+  let pivotal = ranked[0]?.[0] ?? null;
+  let pivotalIsLarge = false;
+  if(pivotal === lp){
+    // Largest dominant — find smallest *other* party with most appearances
+    const others = ranked.filter(([p])=>p !== lp);
+    if(others.length > 0){
+      pivotal = others[0][0];
+    } else {
+      pivotalIsLarge = true; // no other partner at all (rare)
+    }
+  }
+  let pivotalAppearances = power[pivotal] || 0;
+
+  // Detect "co-pivotal" — multiple parties tied at the top with similar size
+  const topCount = ranked[0]?.[1] || 0;
+  const tiedAtTop = ranked.filter(([,v]) => v === topCount).map(([p])=>p);
+  const coPivotal = tiedAtTop.length >= 3;
+
+  let summary, type;
+  if(pool.length === 0){
+    type = "stuck";
+    summary = "No coalition reaches majority.";
+  } else if(viable.length === 0){
+    type = "no-viable";
+    summary = "No politically viable majority — minority administration most plausible.";
+  } else if(coPivotal){
+    type = "co-pivotal";
+    const partyLabels = tiedAtTop.slice(0,4).map(p => PARTIES[p].label).join(" / ");
+    summary = `Co-pivotal: ${partyLabels} all carry equal weight — any pair forms a majority.`;
+  } else if(pivotalIsLarge){
+    type = "dominant";
+    summary = `${PARTIES[lp].label} can govern as minority; no formal partner needed.`;
+  } else {
+    type = "single";
+    const piv = PARTIES[pivotal].label;
+    summary = `${piv} is pivotal — appears in ${pivotalAppearances} of ${viable.length} viable majorities.`;
+  }
+
+  return {
+    mwcs, viable, pool,
+    power, ranked,
+    pivotal, pivotalIsLarge, pivotalAppearances,
+    coPivotal, tiedAtTop,
+    excludingLargest,
+    summary, type,
+  };
+}
+
+// ================================================================
+// STATE
+// ================================================================
+const state = {
+  filters: JSON.parse(localStorage.getItem("noc26-filters") || "{}"),
+  openId:  localStorage.getItem("noc26-open") || null,
+  selectedParties: [],
+};
+
+function saveState(){
+  localStorage.setItem("noc26-filters", JSON.stringify(state.filters));
+  if(state.openId) localStorage.setItem("noc26-open", state.openId);
+  else localStorage.removeItem("noc26-open");
+}
+
+// ================================================================
+// RENDER: stats, legend, filters, list
+// ================================================================
+// Cache kingmaker analysis per council so we don't recompute it on every render
+const KINGMAKER_CACHE = new Map();
+function kingmakerOf(c){
+  if(!KINGMAKER_CACHE.has(c.name)) KINGMAKER_CACHE.set(c.name, kingmakerAnalysis(c));
+  return KINGMAKER_CACHE.get(c.name);
+}
+
+function render(){
+  renderStats();
+  renderLegend();
+  renderKingmakerOverview();
+  populateFilters();
+  applyFiltersToInputs();
+  renderList();
+  if(state.openId){
+    const c = COUNCILS.find(x=>x.name === state.openId);
+    if(c) openDetail(c);
+  }
+}
+
+function renderStats(){
+  const total = COUNCILS.length;
+  const tiers = {};
+  for(const c of COUNCILS){ tiers[c.tier] = (tiers[c.tier]||0) + 1; }
+  const seats = COUNCILS.reduce((s,c)=>s+c.total,0);
+  const el = document.getElementById("stats");
+  el.innerHTML = `
+    <div class="stat"><b>${total}</b>NOC councils</div>
+    <div class="stat"><b>${seats.toLocaleString()}</b>seats covered</div>
+    <div class="stat"><b>${tiers["County"]||0}</b>counties</div>
+    <div class="stat"><b>${tiers["Unitary"]||0}</b>unitaries</div>
+    <div class="stat"><b>${tiers["Metropolitan"]||0}</b>metro boroughs</div>
+    <div class="stat"><b>${tiers["London"]||0}</b>London boroughs</div>
+    <div class="stat"><b>${tiers["District"]||0}</b>districts</div>
+  `;
+}
+function renderLegend(){
+  document.getElementById("legend").innerHTML = PARTY_ORDER.map(p =>
+    `<span><span class="swatch" style="background:${PARTIES[p].color}"></span>${PARTIES[p].label}</span>`
+  ).join("");
+}
+
+function renderKingmakerOverview(){
+  // Aggregate: which party is the kingmaker (or co-pivotal) in how many councils?
+  const counts = {};
+  let coPivotal = 0, dominant = 0, noViable = 0, excludingCount = 0;
+  for(const c of COUNCILS){
+    const k = kingmakerOf(c);
+    if(k.type === "co-pivotal"){
+      coPivotal++;
+      for(const p of k.tiedAtTop) counts[p] = (counts[p]||0) + 1;
+    } else if(k.type === "dominant"){
+      dominant++;
+    } else if(k.type === "no-viable" || k.type === "stuck"){
+      noViable++;
+    } else if(k.pivotal){
+      counts[k.pivotal] = (counts[k.pivotal]||0) + 1;
+    }
+    if(k.excludingLargest) excludingCount++;
+  }
+  const ranked = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const pills = ranked.map(([p,n]) =>
+    `<span class="pill" data-king="${p}"><span class="swatch" style="background:${PARTIES[p].color}"></span>${PARTIES[p].label} <b>${n}</b></span>`
+  ).join("");
+  document.getElementById("kingmaker-overview").innerHTML = `
+    <h4>Kingmaker rollup — councils where each party is pivotal</h4>
+    <div class="row">${pills}</div>
+    <div style="margin-top:8px;color:var(--muted);font-size:11.5px">
+      ${coPivotal} co-pivotal · ${dominant} largest-party-dominant · ${noViable} no viable majority ·
+      <b>${excludingCount}</b> councils where 2nd+3rd-place blocs can govern <i>excluding</i> the largest party
+    </div>
+  `;
+  // click pill → set kingmaker filter
+  document.querySelectorAll(".kingmaker-overview .pill").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      state.filters.king = el.dataset.king;
+      saveState();
+      applyFiltersToInputs();
+      renderList();
+      window.scrollTo({top: 0, behavior: "smooth"});
+    });
+  });
+}
+
+function populateFilters(){
+  const tiers = [...new Set(COUNCILS.map(c=>c.tier))];
+  const ftier = document.getElementById("f-tier");
+  for(const t of tiers){
+    const o = document.createElement("option"); o.value = t; o.textContent = t; ftier.appendChild(o);
+  }
+  const flarg = document.getElementById("f-largest");
+  const fking = document.getElementById("f-king");
+  for(const p of PARTY_ORDER){
+    const o1 = document.createElement("option"); o1.value = p; o1.textContent = PARTIES[p].label; flarg.appendChild(o1);
+    const o2 = document.createElement("option"); o2.value = p; o2.textContent = PARTIES[p].label; fking.appendChild(o2);
+  }
+  // Special kingmaker filter values
+  const oExcl = document.createElement("option"); oExcl.value = "__excl"; oExcl.textContent = "2nd+3rd can exclude largest"; fking.appendChild(oExcl);
+  const oCo = document.createElement("option"); oCo.value = "__co"; oCo.textContent = "Co-pivotal (3-way)"; fking.appendChild(oCo);
+}
+function applyFiltersToInputs(){
+  document.getElementById("f-tier").value = state.filters.tier || "";
+  document.getElementById("f-largest").value = state.filters.largest || "";
+  document.getElementById("f-king").value = state.filters.king || "";
+  document.getElementById("f-conf").value = state.filters.conf || "";
+  document.getElementById("f-sort").value = state.filters.sort || "alpha";
+  document.getElementById("f-search").value = state.filters.search || "";
+}
+
+function filterList(){
+  let out = COUNCILS.slice();
+  const f = state.filters;
+  if(f.tier)    out = out.filter(c => c.tier === f.tier);
+  if(f.conf)    out = out.filter(c => c.confidence === f.conf);
+  if(f.largest){
+    out = out.filter(c => largestPartyKey(c) === f.largest);
+  }
+  if(f.king){
+    out = out.filter(c => {
+      const k = kingmakerOf(c);
+      if(f.king === "__excl") return !!k.excludingLargest;
+      if(f.king === "__co")   return k.coPivotal;
+      // party-key filter — match if that party is pivotal or in the tied-at-top set
+      return k.pivotal === f.king || (k.coPivotal && k.tiedAtTop.includes(f.king));
+    });
+  }
+  if(f.search){
+    const q = f.search.toLowerCase();
+    out = out.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      c.tier.toLowerCase().includes(q) ||
+      (c.issues||[]).some(i => i.toLowerCase().includes(q)) ||
+      (c.prev||"").toLowerCase().includes(q)
+    );
+  }
+  // sort
+  switch(f.sort){
+    case "seats":   out.sort((a,b)=> b.total - a.total); break;
+    case "gap":     out.sort((a,b)=> gapToMajority(a) - gapToMajority(b)); break;
+    case "largest": out.sort((a,b)=> largestSeats(b) - largestSeats(a)); break;
+    case "alpha":
+    default:        out.sort((a,b)=> a.name.localeCompare(b.name));
+  }
+  return out;
+}
+function largestPartyKey(c){
+  let bestP = null, bestN = -1;
+  for(const p of PARTY_ORDER){ if((c.seats[p]||0) > bestN){ bestN = c.seats[p]||0; bestP = p; } }
+  return bestP;
+}
+function largestSeats(c){ return Math.max(...PARTY_ORDER.map(p=>c.seats[p]||0)); }
+function gapToMajority(c){ return Math.max(0, c.majority - largestSeats(c)); }
+
+function renderList(){
+  const container = document.getElementById("list");
+  const data = filterList();
+  document.getElementById("readout").textContent = `${data.length} council${data.length===1?"":"s"}`;
+  container.innerHTML = "";
+  for(const c of data){
+    const card = document.createElement("article");
+    card.className = "card";
+    const lp = largestPartyKey(c);
+    const lpSeats = c.seats[lp] || 0;
+    const gap = c.majority - lpSeats;
+    const k = kingmakerOf(c);
+    const topMwc = (k.viable[0] || k.mwcs[0]);
+
+    // Kingmaker badge
+    let kingBadge;
+    if(k.type === "stuck"){
+      kingBadge = `<span class="king-badge none">No majority arithmetic</span>`;
+    } else if(k.type === "no-viable"){
+      kingBadge = `<span class="king-badge none">No viable majority</span>`;
+    } else if(k.type === "co-pivotal"){
+      const labels = k.tiedAtTop.slice(0,3).map(p=>`<span class="swatch" style="background:${PARTIES[p].color};margin-right:0"></span>${PARTIES[p].label}`).join(" / ");
+      kingBadge = `<span class="king-badge">Co-pivotal: ${labels}</span>`;
+    } else if(k.type === "dominant"){
+      kingBadge = `<span class="king-badge">${PARTIES[lp].label} can govern alone</span>`;
+    } else {
+      kingBadge = `<span class="king-badge"><span class="swatch" style="background:${PARTIES[k.pivotal].color};margin-right:0"></span>Kingmaker: ${PARTIES[k.pivotal].label}</span>`;
+    }
+
+    const altFlag = k.excludingLargest
+      ? `<span class="king-badge alt-flag" title="${k.excludingLargest.parties.map(p=>PARTIES[p].label).join(' + ')} = ${k.excludingLargest.total} seats">Alt bloc excludes ${PARTIES[lp].label}</span>`
+      : "";
+
+    const topMwcText = topMwc
+      ? `Most likely: <b>${topMwc.parties.map(p=>PARTIES[p].label).join(" + ")}</b> (${topMwc.total})`
+      : "";
+
+    card.innerHTML = `
+      <div class="card-head">
+        <div>
+          <div class="name">${c.name}</div>
+          <div class="tier">${c.tier} · ${c.total} seats · majority ${c.majority}</div>
+        </div>
+        <span class="confidence ${c.confidence}">${c.confidence}</span>
+      </div>
+      <div class="bar">${seatBarHTML(c)}</div>
+      <div class="summary">
+        <span><b style="color:var(--p-${lp})">●</b> Largest: <b>${PARTIES[lp].label}</b> ${lpSeats}</span>
+        <span class="gap-to-maj">${gap > 0 ? `${gap} from majority` : "at majority"}</span>
+      </div>
+      <div class="king-line">
+        ${kingBadge}
+        ${altFlag}
+      </div>
+      ${topMwcText ? `<div class="king-line" style="color:var(--muted)">${topMwcText}</div>` : ""}
+    `;
+    card.addEventListener("click", ()=> openDetail(c));
+    container.appendChild(card);
+  }
+}
+function seatBarHTML(c){
+  const segs = [];
+  for(const p of PARTY_ORDER){
+    const n = c.seats[p] || 0;
+    if(n === 0) continue;
+    const w = (n / c.total) * 100;
+    segs.push(`<div class="seg ${p}" style="width:${w}%" title="${PARTIES[p].label}: ${n}"></div>`);
+  }
+  return segs.join("");
+}
+
+// ================================================================
+// DETAIL & SIMULATOR
+// ================================================================
+function openDetail(c){
+  state.openId = c.name; saveState();
+  state.selectedParties = []; // start empty
+  const overlay = document.getElementById("overlay");
+  const el = document.getElementById("detail");
+  overlay.classList.remove("hidden");
+
+  const lp = largestPartyKey(c);
+  const lpSeats = c.seats[lp] || 0;
+  const gap = c.majority - lpSeats;
+
+  el.innerHTML = `
+    <div class="detail-head">
+      <h2>${c.name}</h2>
+      <button class="closeBtn" id="closeDetail">Close ✕</button>
+    </div>
+    <dl class="meta">
+      <dt>Tier</dt><dd>${c.tier}</dd>
+      <dt>Total seats</dt><dd>${c.total}</dd>
+      <dt>Majority threshold</dt><dd>${c.majority}</dd>
+      <dt>Largest party</dt><dd>${PARTIES[lp].label} (${lpSeats})${gap>0?` — ${gap} from majority`:""}</dd>
+      <dt>Pre-election</dt><dd>${c.prev}</dd>
+      <dt>Data confidence</dt><dd><span class="confidence ${c.confidence}">${c.confidence}</span></dd>
+    </dl>
+
+    <div class="bar" style="height:20px">${seatBarHTML(c)}</div>
+
+    <h3>Seats by party</h3>
+    <table class="seat-table">
+      <thead><tr><th>Party</th><th>Seats</th><th>% of council</th></tr></thead>
+      <tbody>
+        ${PARTY_ORDER.filter(p=>(c.seats[p]||0)>0).map(p=>`
+          <tr>
+            <td><span class="swatch" style="background:${PARTIES[p].color}"></span>${PARTIES[p].label}${p==="OTH" && c.othLabel ? ` — <i>${c.othLabel}</i>` : ""}</td>
+            <td>${c.seats[p]}</td>
+            <td>${(100*c.seats[p]/c.total).toFixed(1)}%</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+
+    <h3>Local issues &amp; sticking points</h3>
+    <ul class="issues">${(c.issues||[]).map(i=>`<li>${i}</li>`).join("")}</ul>
+
+    <h3>Kingmaker analysis</h3>
+    ${renderKingmakerDetail(c)}
+
+    <h3>Coalition simulator</h3>
+    <div class="simulator">
+      <div class="party-chips" id="chips"></div>
+      <div class="sim-result" id="simResult"></div>
+    </div>
+
+    <h3>Most likely majorities <span style="font-weight:400;color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0;">(minimum-winning coalitions, ranked by viability)</span></h3>
+    <div class="suggestions" id="suggestions"></div>
+
+    <h3>Sources</h3>
+    <div class="sources">
+      ${(c.sources||[]).map(s=>`<a href="${s}" target="_blank" rel="noopener">${s.replace(/^https?:\/\//,'').replace(/\/$/,'')}</a>`).join("<br>")}
+    </div>
+  `;
+
+  document.getElementById("closeDetail").addEventListener("click", closeDetail);
+  overlay.addEventListener("click", overlayClickHandler);
+
+  renderChips(c);
+  renderSimResult(c);
+  renderSuggestions(c);
+}
+function overlayClickHandler(e){
+  if(e.target.id === "overlay") closeDetail();
+}
+function closeDetail(){
+  document.getElementById("overlay").classList.add("hidden");
+  state.openId = null; saveState();
+}
+
+function renderChips(c){
+  const wrap = document.getElementById("chips");
+  wrap.innerHTML = "";
+  for(const p of PARTY_ORDER){
+    const n = c.seats[p] || 0;
+    if(n === 0) continue;
+    const chip = document.createElement("span");
+    chip.className = "chip" + (state.selectedParties.includes(p) ? " on" : "");
+    chip.innerHTML = `<span class="swatch" style="background:${PARTIES[p].color}"></span>${PARTIES[p].label} <b style="margin-left:4px">${n}</b>`;
+    chip.addEventListener("click", ()=>{
+      const idx = state.selectedParties.indexOf(p);
+      if(idx >= 0) state.selectedParties.splice(idx,1);
+      else state.selectedParties.push(p);
+      renderChips(c);
+      renderSimResult(c);
+    });
+    wrap.appendChild(chip);
+  }
+}
+function renderSimResult(c){
+  const sel = state.selectedParties;
+  const sum = sel.reduce((s,p)=>s + (c.seats[p]||0), 0);
+  const pct = Math.min(100, (sum / c.majority) * 100);
+  const pctOfTotal = (c.majority / c.total) * 100;
+  const score = compatScore(sel);
+  const band = viabilityBand(score, sum, c.majority);
+  const labelMap = {HIGH:"High viability", MED:"Medium viability", LOW:"Low viability", SHORT:"Below majority"};
+  document.getElementById("simResult").innerHTML = `
+    <div class="sim-bar">
+      <div class="sim-bar-fill" style="width:${(sum/Math.max(c.total,1))*100}%"></div>
+      <div class="sim-bar-line" style="left:${pctOfTotal}%"></div>
+    </div>
+    <div class="sim-meta">
+      <span><b>${sum}</b> seats</span>
+      <span>need <b>${c.majority}</b></span>
+      <span>${sum >= c.majority ? `surplus <b>+${sum-c.majority}</b>` : `short by <b>${c.majority-sum}</b>`}</span>
+      ${sel.length>=2?`<span>compat <b>${score.toFixed(2)}</b></span>`:``}
+      <span class="viability-pill ${band}">${labelMap[band]}</span>
+    </div>
+  `;
+}
+function renderSuggestions(c){
+  // Use MWCs (minimum-winning coalitions) so each suggestion is a "tight" arrangement.
+  const arrangements = enumerateMWCs(c).slice(0, 8);
+  const wrap = document.getElementById("suggestions");
+  if(arrangements.length === 0){
+    wrap.innerHTML = `<div class="suggestion"><div class="title">No coalition reaches the ${c.majority}-seat majority threshold.</div><div class="parties">All-party arithmetic alone is insufficient — review issues panel.</div></div>`;
+    return;
+  }
+  const lp = largestPartyKey(c);
+  wrap.innerHTML = arrangements.map(a => {
+    const excludesLargest = !a.parties.includes(lp);
+    const bandLabel = a.band==="HIGH"?"High":a.band==="MED"?"Medium":"Low";
+    return `
+    <div class="suggestion" data-parties="${a.parties.join(',')}">
+      <div class="title">
+        <span><b>${a.parties.map(p=>PARTIES[p].label).join(" + ")}</b> · ${a.total} seats <span style="color:var(--muted)">(+${a.total - c.majority})</span> ${excludesLargest ? `<span class="king-badge alt-flag" style="margin-left:6px">excludes ${PARTIES[lp].label}</span>` : ""}</span>
+        <span class="viability-pill ${a.band}">${bandLabel}</span>
+      </div>
+      <div class="parties">
+        ${a.parties.map(p=>`<span><span class="swatch" style="background:${PARTIES[p].color}"></span>${PARTIES[p].label} ${c.seats[p]}</span>`).join("")}
+        <span style="margin-left:auto">compat ${a.score.toFixed(2)}</span>
+      </div>
+    </div>
+  `;}).join("");
+  wrap.querySelectorAll(".suggestion").forEach(el => {
+    el.addEventListener("click", ()=>{
+      state.selectedParties = el.dataset.parties.split(",");
+      renderChips(c);
+      renderSimResult(c);
+    });
+  });
+}
+
+function renderKingmakerDetail(c){
+  const k = kingmakerOf(c);
+  const lp = largestPartyKey(c);
+  // Build power bars
+  const maxAppearances = Math.max(1, ...Object.values(k.power));
+  const totalViable = (k.viable.length || k.pool.length);
+  const powerRows = k.ranked.map(([p, n]) => {
+    const pct = (n / maxAppearances) * 100;
+    return `
+      <div class="power-row">
+        <span><span class="swatch" style="background:${PARTIES[p].color}"></span>${PARTIES[p].label}</span>
+        <div class="power-bar"><div style="width:${pct}%"></div></div>
+        <span>${n}/${totalViable}</span>
+      </div>
+    `;
+  }).join("");
+
+  const altBox = k.excludingLargest ? `
+    <div class="alt">
+      <b>Alternative bloc excluding ${PARTIES[lp].label}:</b>
+      ${k.excludingLargest.parties.map(p=>`<span><span class="swatch" style="background:${PARTIES[p].color}"></span>${PARTIES[p].label} ${c.seats[p]}</span>`).join(" + ")} = ${k.excludingLargest.total}
+      <span class="viability-pill ${k.excludingLargest.band}" style="margin-left:6px">${k.excludingLargest.band==="HIGH"?"High":k.excludingLargest.band==="MED"?"Medium":"Low"} viability</span>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">The 2nd/3rd-place parties can form a majority without the largest party — a meaningful exit option.</div>
+    </div>
+  ` : "";
+
+  return `
+    <div class="king-analysis">
+      <p class="lead">${k.summary}</p>
+      ${k.viable.length === 0 && k.mwcs.length > 0 ? `<p style="color:var(--muted);font-size:12px">No politically viable arrangement clears the threshold; the figures below show arithmetic possibilities only.</p>` : ""}
+      <p style="font-size:12px;color:var(--muted);margin-top:6px">Pivotal frequency — how often each party appears across the ${totalViable} ${k.viable.length>0?"viable":"arithmetic"} minimum-winning coalitions:</p>
+      <div class="power-bars">${powerRows}</div>
+      ${altBox}
+    </div>
+  `;
+}
+
+// ================================================================
+// EVENT WIRING
+// ================================================================
+function wire(){
+  document.getElementById("f-tier").addEventListener("change", e=>{ state.filters.tier = e.target.value; saveState(); renderList(); });
+  document.getElementById("f-largest").addEventListener("change", e=>{ state.filters.largest = e.target.value; saveState(); renderList(); });
+  document.getElementById("f-king").addEventListener("change", e=>{ state.filters.king = e.target.value; saveState(); renderList(); });
+  document.getElementById("f-conf").addEventListener("change", e=>{ state.filters.conf = e.target.value; saveState(); renderList(); });
+  document.getElementById("f-sort").addEventListener("change", e=>{ state.filters.sort = e.target.value; saveState(); renderList(); });
+  document.getElementById("f-search").addEventListener("input", e=>{ state.filters.search = e.target.value; saveState(); renderList(); });
+  document.addEventListener("keydown", e=>{ if(e.key === "Escape") closeDetail(); });
+}
+
+render();
+wire();
+</script>
+</body>
+</html>
